@@ -298,6 +298,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
       gap: 30px;
+      margin-bottom: 30px;
     }
     
     .card {
@@ -422,6 +423,30 @@
     
     .book-btn svg {
       margin-left: 8px;
+    }
+
+    /* Кнопка "Показать еще" */
+    .load-more-container {
+      text-align: center;
+      margin: 30px 0;
+    }
+    
+    .load-more-btn {
+      padding: 12px 30px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .load-more-btn:hover {
+      background: #E04A50;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 90, 95, 0.3);
     }
 
     /* Секция "О нас" */
@@ -706,6 +731,23 @@
       .contacts-section {
         padding: 30px 20px;
       }
+      
+      /* Исправление для кнопок связи в мобильной версии */
+      .contact-dropdown-btn {
+        padding: 12px 20px;
+        font-size: 1rem;
+      }
+      
+      .contact-dropdown-content {
+        min-width: 180px;
+        left: 0;
+        transform: none;
+      }
+      
+      .hero-btn {
+        padding: 12px 20px;
+        font-size: 1rem;
+      }
     }
   </style>
 </head>
@@ -767,6 +809,9 @@
       <p class="section-subtitle">49 уникальных объектов в Москве и Московской области</p>
       <div class="apartments-grid" id="apartmentsContainer">
         <!-- Карточки генерируются через JS -->
+      </div>
+      <div class="load-more-container">
+        <button class="load-more-btn" id="loadMoreBtn">Показать еще</button>
       </div>
     </section>
 
@@ -1462,11 +1507,23 @@
       }
     ];
 
-    // Инициализация галереи
+    // Переменные для пагинации
+    let currentPage = 1;
+    const apartmentsPerPage = 6;
+    let totalPages = Math.ceil(apartments.length / apartmentsPerPage);
+
+    // Инициализация галереи с пагинацией
     function initGallery() {
       const container = document.getElementById('apartmentsContainer');
+      container.innerHTML = ''; // Очищаем контейнер
       
-      apartments.forEach(apartment => {
+      // Получаем апартаменты для текущей страницы
+      const startIndex = (currentPage - 1) * apartmentsPerPage;
+      const endIndex = startIndex + apartmentsPerPage;
+      const apartmentsToShow = apartments.slice(startIndex, endIndex);
+      
+      // Создаем карточки для текущей страницы
+      apartmentsToShow.forEach(apartment => {
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
@@ -1510,6 +1567,85 @@
         card.querySelector('.apartment-img').addEventListener('click', () => openGallery(apartment));
         container.appendChild(card);
       });
+      
+      // Обновляем состояние кнопки "Показать еще"
+      updateLoadMoreButton();
+    }
+
+    // Функция для обновления состояния кнопки "Показать еще"
+    function updateLoadMoreButton() {
+      const loadMoreBtn = document.getElementById('loadMoreBtn');
+      if (currentPage >= totalPages) {
+        loadMoreBtn.style.display = 'none';
+      } else {
+        loadMoreBtn.style.display = 'inline-block';
+      }
+    }
+
+    // Функция для загрузки следующей страницы
+    function loadMoreApartments() {
+      currentPage++;
+      const container = document.getElementById('apartmentsContainer');
+      
+      // Получаем апартаменты для следующей страницы
+      const startIndex = (currentPage - 1) * apartmentsPerPage;
+      const endIndex = startIndex + apartmentsPerPage;
+      const apartmentsToShow = apartments.slice(startIndex, endIndex);
+      
+      // Добавляем новые карточки
+      apartmentsToShow.forEach(apartment => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="apartment-img-container">
+            <img src="${apartment.images[0]}" class="apartment-img" alt="Фотография апартаментов ${apartment.title}" loading="lazy">
+          </div>
+          <div class="apartment-info">
+            <h3 class="apartment-title">${apartment.title}</h3>
+            <div class="apartment-location">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              ${apartment.address}
+            </div>
+            <div class="apartment-features">
+              <div class="feature">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M3 11l19-9-9 19-2-8-8-2z"></path>
+                </svg>
+                ${apartment.district}
+              </div>
+              <div class="feature">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                </svg>
+                ${apartment.type}
+              </div>
+            </div>
+            <div class="book-btn-container">
+              <button class="book-btn" onclick="window.open('https://reservationsteps.ru/rooms/index/f1e7bb98-c97d-4b70-aa25-9c746e60a635?token=bdd98&dfrom=03-05-2025&dto=04-05-2025&lang=ru&utm_source=share_from_pms', '_blank')">
+                Забронировать
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M5 12h14M12 5l7 7-7 7"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        `;
+        
+        card.querySelector('.apartment-img').addEventListener('click', () => openGallery(apartment));
+        container.appendChild(card);
+      });
+      
+      // Прокручиваем к последней загруженной карточке
+      const cards = container.querySelectorAll('.card');
+      if (cards.length > 0) {
+        cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      
+      // Обновляем состояние кнопки "Показать еще"
+      updateLoadMoreButton();
     }
 
     // Функции для вкладок и FAQ
@@ -1652,6 +1788,7 @@
     // Инициализация
     window.onload = function() {
       initGallery();
+      document.getElementById('loadMoreBtn').addEventListener('click', loadMoreApartments);
     };
   </script>
 </body>
