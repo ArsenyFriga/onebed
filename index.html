@@ -248,10 +248,11 @@
     .contact-dropdown-link {
       display: flex;
       align-items: center;
-      padding: 8px 16px;
+      padding: 12px 16px;
       color: var(--text);
       text-decoration: none;
       transition: all 0.2s;
+      white-space: nowrap;
     }
     
     .contact-dropdown-link:hover {
@@ -732,20 +733,57 @@
         padding: 30px 20px;
       }
       
-      /* Исправление для кнопок связи в мобильной версии */
+      /* Улучшенные стили для кнопок связи в мобильной версии */
+      .contact-dropdown {
+        width: 100%;
+        text-align: center;
+      }
+      
       .contact-dropdown-btn {
+        width: 100%;
         padding: 12px 20px;
         font-size: 1rem;
+        box-sizing: border-box;
       }
       
       .contact-dropdown-content {
-        min-width: 180px;
+        width: 100%;
         left: 0;
         transform: none;
+        box-sizing: border-box;
+      }
+      
+      .contact-dropdown-link {
+        padding: 12px 20px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       
       .hero-btn {
+        width: 100%;
         padding: 12px 20px;
+        font-size: 1rem;
+        box-sizing: border-box;
+      }
+      
+      .hero-content {
+        width: 100%;
+        padding: 0 15px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      /* Дополнительные стили для очень маленьких экранов */
+      .contact-dropdown-link {
+        font-size: 0.9rem;
+      }
+      
+      .hero-title {
+        font-size: 1.8rem;
+      }
+      
+      .hero-subtitle {
         font-size: 1rem;
       }
     }
